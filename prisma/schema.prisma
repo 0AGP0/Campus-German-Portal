@@ -1,0 +1,121 @@
+// Campus German CRM Portal - Prisma Schema
+// Roller: ADMIN, CONSULTANT, STUDENT
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CONSULTANT
+  STUDENT
+}
+
+// Öğrenci aşama/durum (CRM pipeline)
+enum StudentStage {
+  BASVURU
+  BELGELER_TAMAM
+  ODEME_BEKLIYOR
+  KAYIT_TAMAM
+}
+
+// Kullanıcılar: admin, danışman, öğrenci
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  role         Role
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assignedStudents Student[] @relation("ConsultantStudents")
+  studentProfile   Student?  @relation("StudentUser")
+}
+
+model Student {
+  id           String       @id @default(cuid())
+  userId       String?      @unique
+  consultantId String?
+  stage        StudentStage @default(BASVURU)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user       User?           @relation("StudentUser", fields: [userId], references: [id], onDelete: SetNull)
+  consultant User?           @relation("ConsultantStudents", fields: [consultantId], references: [id], onDelete: SetNull)
+  crmData    StudentCrmData?
+  documents  Document[]
+}
+
+model CrmField {
+  id         String   @id @default(cuid())
+  key        String   @unique
+  label      String
+  type       String
+  required   Boolean  @default(false)
+  order      Int      @default(0)
+  options    String?
+  sectionId  String?
+  createdAt  DateTime @default(now())
+
+  section CrmSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+}
+
+model CrmTab {
+  id        String   @id @default(cuid())
+  label     String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  sections CrmSection[]
+}
+
+model CrmSection {
+  id        String   @id @default(cuid())
+  tabId     String
+  title     String
+  order     Int      @default(0)
+  width     Int      @default(100)
+  createdAt DateTime @default(now())
+
+  tab    CrmTab     @relation(fields: [tabId], references: [id], onDelete: Cascade)
+  fields CrmField[]
+}
+
+model StudentCrmData {
+  id        String   @id @default(cuid())
+  studentId String   @unique
+  data      String
+  updatedAt DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  studentId  String
+  filename   String
+  filepath   String
+  mimeType   String?
+  tag        String?
+  uploadedBy String
+  createdAt  DateTime @default(now())
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Template {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  htmlPath     String
+  placeholders String
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
