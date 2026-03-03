@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireConsultant } from "@/lib/api-auth";
+import type { Prisma } from "@prisma/client";
 
 export async function GET(request: Request) {
   const auth = await requireConsultant();
@@ -13,9 +14,9 @@ export async function GET(request: Request) {
   const limit = Math.min(50, Math.max(5, parseInt(searchParams.get("limit") || "20", 10)));
   const skip = (page - 1) * limit;
 
-  const where: { consultantId?: string | null; stage?: string; user?: { OR: { email?: { contains: string; mode: "insensitive" }; name?: { contains: string; mode: "insensitive" } }[] } } = isAdmin ? {} : { consultantId: auth.session.id };
+  const where: Prisma.StudentWhereInput = isAdmin ? {} : { consultantId: auth.session.id };
   if (stage && ["BASVURU", "BELGELER_TAMAM", "ODEME_BEKLIYOR", "KAYIT_TAMAM"].includes(stage)) {
-    where.stage = stage;
+    where.stage = stage as Prisma.StudentStage;
   }
   if (q) {
     where.user = {

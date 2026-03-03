@@ -27,7 +27,7 @@ export async function GET(
 
 const updateSchema = z.object({
   stage: z.enum(["BASVURU", "BELGELER_TAMAM", "ODEME_BEKLIYOR", "KAYIT_TAMAM"]).optional(),
-  data: z.record(z.unknown()).optional(),
+  data: z.record(z.string(), z.unknown()).optional(),
   consultantId: z.string().nullable().optional(),
 });
 
