@@ -29,7 +29,7 @@ export function PaletteFieldItem({ type, id }: { type: PaletteFieldType; id: str
   });
   const style: React.CSSProperties = transform
     ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
-    : undefined;
+    : {};
   const Icon = icons[type];
 
   return (
