@@ -16,7 +16,8 @@ export async function GET(request: Request) {
 
   const where: Prisma.StudentWhereInput = isAdmin ? {} : { consultantId: auth.session.id };
   if (stage && ["BASVURU", "BELGELER_TAMAM", "ODEME_BEKLIYOR", "KAYIT_TAMAM"].includes(stage)) {
-    where.stage = stage as Prisma.StudentStage;
+    // stage string'ini enum olarak doğruladığımız için burada geniş cast güvenli
+    where.stage = stage as any;
   }
   if (q) {
     where.user = {
