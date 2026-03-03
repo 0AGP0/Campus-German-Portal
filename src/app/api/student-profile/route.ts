@@ -18,7 +18,7 @@ export async function GET() {
 }
 
 const updateSchema = z.object({
-  data: z.record(z.unknown()),
+  data: z.record(z.string(), z.unknown()),
 });
 
 export async function PATCH(request: Request) {
