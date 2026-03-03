@@ -15,13 +15,17 @@ export async function GET(
     include: {
       user: { select: { id: true, email: true, name: true } },
       documents: true,
+      crmData: true,
     },
   });
   if (!student) return NextResponse.json({ error: "Öğrenci bulunamadı." }, { status: 404 });
   if (auth.session.role !== "ADMIN" && student.consultantId !== auth.session.id) {
     return NextResponse.json({ error: "Yetkisiz." }, { status: 403 });
   }
-  return NextResponse.json(student);
+  const crmData = student.crmData?.data
+    ? (JSON.parse(student.crmData.data) as Record<string, unknown>)
+    : {};
+  return NextResponse.json({ ...student, crmData });
 }
 
 const updateSchema = z.object({

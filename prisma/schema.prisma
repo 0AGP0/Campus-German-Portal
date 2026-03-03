@@ -46,14 +46,61 @@ model Student {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  user       User?      @relation("StudentUser", fields: [userId], references: [id], onDelete: SetNull)
-  consultant User?      @relation("ConsultantStudents", fields: [consultantId], references: [id], onDelete: SetNull)
+  user       User?           @relation("StudentUser", fields: [userId], references: [id], onDelete: SetNull)
+  consultant User?           @relation("ConsultantStudents", fields: [consultantId], references: [id], onDelete: SetNull)
+  crmData    StudentCrmData?
   documents  Document[]
+}
+
+model CrmTab {
+  id        String   @id @default(cuid())
+  label     String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  sections CrmSection[]
+}
+
+model CrmSection {
+  id        String   @id @default(cuid())
+  tabId     String
+  title     String
+  order     Int      @default(0)
+  width     Int      @default(100)
+  createdAt DateTime @default(now())
+
+  tab    CrmTab     @relation(fields: [tabId], references: [id], onDelete: Cascade)
+  fields CrmField[]
+}
+
+model CrmField {
+  id         String   @id @default(cuid())
+  key        String   @unique
+  label      String
+  type       String
+  required   Boolean  @default(false)
+  order      Int      @default(0)
+  options    String?
+  sectionId  String?
+  hidden     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  section CrmSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+}
+
+model StudentCrmData {
+  id        String   @id @default(cuid())
+  studentId String   @unique
+  data      String
+  updatedAt DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 model Document {
   id         String   @id @default(cuid())
   studentId  String
+  docFieldId String?
   filename   String
   filepath   String
   mimeType   String?
@@ -61,15 +108,40 @@ model Document {
   uploadedBy String
   createdAt  DateTime @default(now())
 
-  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student  Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  docField DocField? @relation(fields: [docFieldId], references: [id], onDelete: SetNull)
+}
+
+model DocTab {
+  id        String   @id @default(cuid())
+  label     String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  fields DocField[]
+}
+
+model DocField {
+  id          String   @id @default(cuid())
+  tabId       String
+  label       String
+  description String?
+  required    Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  tab       DocTab     @relation(fields: [tabId], references: [id], onDelete: Cascade)
+  documents Document[]
 }
 
 model Template {
   id           String   @id @default(cuid())
   name         String
   description  String?
-  htmlPath     String
-  placeholders String
+  htmlPath     String?  // opsiyonel; content varsa o kullanılır
+  content      String?  @db.Text // HTML gövde (placeholders: {{placeholder_key}})
+  placeholders String?  // virgülle ayrılmış (opsiyonel, content'ten parse edilebilir)
+  mapping      String?  @db.Text // JSON: { "placeholder_key": "user.name" | "student.stage" | "crm.field_key" | "date" | "year" }
   active       Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

@@ -278,12 +278,15 @@ export default function AdminUsersPage() {
               {form.role === "STUDENT" && (
                 <div className="space-y-2">
                   <Label>Danışman (isteğe bağlı)</Label>
-                  <Select value={form.consultantId} onValueChange={(v) => setForm((p) => ({ ...p, consultantId: v }))}>
+                  <Select
+                    value={form.consultantId || "__none__"}
+                    onValueChange={(v) => setForm((p) => ({ ...p, consultantId: v === "__none__" ? "" : v }))}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Atanmasın" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Atanmasın</SelectItem>
+                      <SelectItem value="__none__">Atanmasın</SelectItem>
                       {consultants.map((u) => (
                         <SelectItem key={u.id} value={u.id}>{u.name ?? u.email}</SelectItem>
                       ))}
@@ -422,12 +425,12 @@ export default function AdminUsersPage() {
                 <div className="space-y-2">
                   <Label>Danışman (isteğe bağlı)</Label>
                   <Select
-                    value={editForm.consultantId}
-                    onValueChange={(v) => setEditForm((p) => p ? { ...p, consultantId: v } : p)}
+                    value={(editForm.consultantId ?? "") || "__none__"}
+                    onValueChange={(v) => setEditForm((p) => (p ? { ...p, consultantId: v === "__none__" ? "" : v } : p))}
                   >
                     <SelectTrigger><SelectValue placeholder="Atanmasın" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Atanmasın</SelectItem>
+                      <SelectItem value="__none__">Atanmasın</SelectItem>
                       {consultants.map((u) => (
                         <SelectItem key={u.id} value={u.id}>{u.name ?? u.email}</SelectItem>
                       ))}

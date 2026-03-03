@@ -4,7 +4,7 @@ import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Settings, LayoutDashboard, ArrowRight, History } from "lucide-react";
+import { Users, Settings, LayoutDashboard, ArrowRight, History, FileText } from "lucide-react";
 
 const roleLabels: Record<string, string> = {
   ADMIN: "Admin",
@@ -80,6 +80,29 @@ export default async function AdminDashboardPage() {
             <Button asChild variant="outline" className="w-full gap-2 border-slate-200">
               <Link href="/dashboard/admin/assignments">
                 Atamaları yönet
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+        <Card className="group overflow-hidden border-slate-200 transition-shadow hover:shadow-xl hover:shadow-primary/5">
+          <div className="p-1">
+            <div className="relative flex h-48 items-center justify-center overflow-hidden rounded-lg bg-slate-100">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
+              <FileText className="relative text-6xl text-primary/40 transition-transform group-hover:scale-110" />
+            </div>
+          </div>
+          <CardContent className="p-6">
+            <div className="mb-2 flex items-center gap-2">
+              <FileText className="size-5 text-primary" />
+              <h3 className="text-xl font-bold text-slate-900">CRM Alanları</h3>
+            </div>
+            <p className="mb-6 text-sm leading-relaxed text-slate-600">
+              Öğrenci form alanlarını sekmeler ve konteynerlar ile düzenleyin.
+            </p>
+            <Button asChild variant="outline" className="w-full gap-2 border-slate-200">
+              <Link href="/dashboard/admin/crm-fields">
+                CRM düzenle
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
