@@ -16,9 +16,8 @@ export default async function AdminDashboardPage() {
   const session = await getSession();
   if (!session || session.role !== "ADMIN") redirect("/login");
 
-  const [userCount, crmFieldCount, recentUsers] = await Promise.all([
+  const [userCount, recentUsers] = await Promise.all([
     prisma.user.count(),
-    prisma.crmField.count(),
     prisma.user.findMany({
       take: 5,
       orderBy: { createdAt: "desc" },
@@ -33,7 +32,7 @@ export default async function AdminDashboardPage() {
           Admin Paneli
         </h1>
         <p className="mt-2 max-w-2xl text-lg text-slate-600">
-          Platform işlemlerini yönetin, kullanıcı hesaplarını ve sistem veri alanlarını tek merkezden yapılandırın.
+          Platform işlemlerini yönetin, kullanıcı hesaplarını ve öğrenci atamalarını tek merkezden yapılandırın.
         </p>
       </div>
       <div className="grid gap-6 md:grid-cols-2">
@@ -68,22 +67,19 @@ export default async function AdminDashboardPage() {
             <div className="relative flex h-48 items-center justify-center overflow-hidden rounded-lg bg-slate-100">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
               <Settings className="relative text-6xl text-primary/40 transition-transform group-hover:scale-110" />
-              <div className="absolute bottom-4 right-4 rounded-lg border border-slate-100 bg-white p-2 shadow-sm">
-                <span className="font-bold text-primary">{crmFieldCount} Alan</span>
-              </div>
             </div>
           </div>
           <CardContent className="p-6">
             <div className="mb-2 flex items-center gap-2">
               <Settings className="size-5 text-primary" />
-              <h3 className="text-xl font-bold text-slate-900">CRM Alanları</h3>
+              <h3 className="text-xl font-bold text-slate-900">Öğrenci atamaları</h3>
             </div>
             <p className="mb-6 text-sm leading-relaxed text-slate-600">
-              Öğrenci kayıt formları için özel alan ve veri yapılarını tanımlayın.
+              Öğrencileri danışmanlara atayın.
             </p>
             <Button asChild variant="outline" className="w-full gap-2 border-slate-200">
-              <Link href="/dashboard/admin/crm-fields">
-                Alanları yapılandır
+              <Link href="/dashboard/admin/assignments">
+                Atamaları yönet
                 <ArrowRight className="size-4" />
               </Link>
             </Button>

@@ -14,7 +14,6 @@ export async function GET(
     where: { id },
     include: {
       user: { select: { id: true, email: true, name: true } },
-      crmData: true,
       documents: true,
     },
   });
@@ -27,7 +26,6 @@ export async function GET(
 
 const updateSchema = z.object({
   stage: z.enum(["BASVURU", "BELGELER_TAMAM", "ODEME_BEKLIYOR", "KAYIT_TAMAM"]).optional(),
-  data: z.record(z.string(), z.unknown()).optional(),
   consultantId: z.string().nullable().optional(),
 });
 
@@ -65,17 +63,9 @@ export async function PATCH(
       data: { consultantId: parsed.data.consultantId },
     });
   }
-  if (parsed.data.data != null) {
-    const json = JSON.stringify(parsed.data.data);
-    await prisma.studentCrmData.upsert({
-      where: { studentId: id },
-      create: { studentId: id, data: json },
-      update: { data: json },
-    });
-  }
   const updated = await prisma.student.findUnique({
     where: { id },
-    include: { user: { select: { name: true, email: true } }, crmData: true },
+    include: { user: { select: { name: true, email: true } } },
   });
   return NextResponse.json(updated);
 }

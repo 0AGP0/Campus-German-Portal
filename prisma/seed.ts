@@ -66,58 +66,16 @@ async function main() {
           role: "STUDENT",
         },
       });
-      const studentRecord = await prisma.student.create({
+      await prisma.student.create({
         data: {
           userId: user.id,
           consultantId: consultant?.id ?? null,
           stage: s.email.includes("ogrenci1") ? "BASVURU" : "BELGELER_TAMAM",
         },
       });
-      await prisma.studentCrmData.upsert({
-        where: { studentId: studentRecord.id },
-        create: {
-          studentId: studentRecord.id,
-          data: JSON.stringify({
-            fullName: s.name,
-            phone: "+90 532 xxx xx xx",
-            program: "Yazılım Mühendisliği",
-          }),
-        },
-        update: {},
-      });
       console.log("Öğrenci oluşturuldu:", s.email, "şifre: Ogrenci123!");
     }
   }
-
-  // CRM: varsayılan sekme ve konteyner, ardından alanlar
-  let defaultTab = await prisma.crmTab.findFirst({ orderBy: { order: "asc" } });
-  if (!defaultTab) {
-    defaultTab = await prisma.crmTab.create({
-      data: { label: "Genel", order: 0 },
-    });
-    console.log("Varsayılan CRM sekmesi oluşturuldu.");
-  }
-  let defaultSection = await prisma.crmSection.findFirst({ where: { tabId: defaultTab.id } });
-  if (!defaultSection) {
-    defaultSection = await prisma.crmSection.create({
-      data: { tabId: defaultTab.id, title: "Kişisel Bilgiler", order: 0 },
-    });
-    console.log("Varsayılan CRM konteyneri oluşturuldu.");
-  }
-
-  const fields = [
-    { key: "fullName", label: "Ad Soyad", type: "text", required: true, order: 0, sectionId: defaultSection.id },
-    { key: "phone", label: "Telefon", type: "text", required: false, order: 1, sectionId: defaultSection.id },
-    { key: "program", label: "Program", type: "text", required: true, order: 2, sectionId: defaultSection.id },
-  ];
-  for (const f of fields) {
-    await prisma.crmField.upsert({
-      where: { key: f.key },
-      create: f,
-      update: { sectionId: f.sectionId },
-    });
-  }
-  console.log("Örnek CRM alanları eklendi.");
 }
 
 main()

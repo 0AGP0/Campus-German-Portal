@@ -49,7 +49,6 @@ const pathToLabel: Record<string, string> = {
   admin: "Ana sayfa",
   users: "Kullanıcılar",
   assignments: "Öğrenci atamaları",
-  "crm-fields": "CRM Alanları",
   consultant: "Ana sayfa",
   students: "Öğrenciler",
   documents: "Belgeler",
@@ -124,14 +123,6 @@ export function DashboardShell({
                         <Link href="/dashboard/admin/users">
                           <Users className="size-4" />
                           <span>Kullanıcılar</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild>
-                        <Link href="/dashboard/admin/crm-fields">
-                          <Settings className="size-4" />
-                          <span>CRM Alanları</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
