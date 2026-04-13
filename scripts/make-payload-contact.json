@@ -1,0 +1,13 @@
+{
+  "formType": "contact",
+  "formData": {
+    "firstName": "Ali",
+    "lastName": "Yılmaz",
+    "email": "ali@example.com",
+    "phone": "+90 555 111 2233",
+    "city": "Berlin",
+    "message": "Make.com test"
+  },
+  "source": "Make.com",
+  "stage": "yeni"
+}

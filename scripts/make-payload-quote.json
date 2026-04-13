@@ -1,0 +1,12 @@
+{
+  "formType": "quote",
+  "formData": {
+    "firstName": "Mehmet",
+    "email": "mehmet@example.com",
+    "phone": "+49 170 0000000",
+    "program": "B2",
+    "level": "Orta"
+  },
+  "source": "Make.com",
+  "stage": "yeni"
+}
