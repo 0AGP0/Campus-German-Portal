@@ -4,8 +4,20 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { prismaLeadToDto } from "@/lib/mappers";
 import { notifyNewLeadEmail } from "@/lib/mail";
-import { leadFromInboundPayload, type InboundLeadPayload } from "@/lib/inboundLead";
+import {
+  leadFromInboundPayload,
+  normalizeInboundFormData,
+  type InboundLeadPayload,
+} from "@/lib/inboundLead";
 import { verifyWebhook } from "@/lib/webhook-verify";
+
+/** Tarayıcı/curl ile “çalışıyor mu” kontrolü (POST gerekli) */
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    hint: "Lead eklemek için POST + JSON gönderin. Make.com: HTTP modülü, Authorization: Bearer WEBHOOK_SECRET",
+  });
+}
 
 function parseCreatedAt(s: string): Date {
   const d = new Date(s);
@@ -17,10 +29,23 @@ export async function POST(req: NextRequest) {
   if (!verifyWebhook(req)) {
     return NextResponse.json({ error: "Webhook doğrulanamadı" }, { status: 401 });
   }
-  const payload = (await req.json()) as InboundLeadPayload;
-  if (!payload?.formType || !payload.formData || typeof payload.formData !== "object") {
-    return NextResponse.json({ error: "formType ve formData gerekli" }, { status: 400 });
+  const body = (await req.json()) as Record<string, unknown>;
+  const formType = body.formType as InboundLeadPayload["formType"] | undefined;
+  const rawFd = body.formData;
+  const formData = normalizeInboundFormData(rawFd);
+  if (!formType || !["booking", "contact", "quote"].includes(formType)) {
+    return NextResponse.json({ error: "formType: booking | contact | quote gerekli" }, { status: 400 });
   }
+  if (rawFd !== undefined && rawFd !== null && (typeof rawFd !== "object" || Array.isArray(rawFd))) {
+    return NextResponse.json({ error: "formData nesne (object) olmalı" }, { status: 400 });
+  }
+  const payload: InboundLeadPayload = {
+    formType,
+    formData,
+    ...(typeof body.id === "string" && body.id.trim() ? { id: body.id.trim() } : {}),
+    ...(typeof body.source === "string" ? { source: body.source } : {}),
+    ...(typeof body.stage === "string" ? { stage: body.stage } : {}),
+  };
   const leadDto = leadFromInboundPayload(payload);
   const createdAt = parseCreatedAt(leadDto.createdAt);
   try {

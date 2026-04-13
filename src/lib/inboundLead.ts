@@ -4,6 +4,25 @@ import type { Lead, LeadFormType } from "../data/leads";
  * Make.com / webhook gövdesi — `formData` anahtarları `DETAIL_FIELD_KEYS` ile uyumlu camelCase olmalı.
  * Örnek: booking için firstName, lastName, email, program, …
  */
+/** Make.com vb. bazen sayı/boolean gönderir; webhook’ta stringe çevrilir */
+export function normalizeInboundFormData(raw: unknown): Record<string, string> {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+    if (v === null || v === undefined) continue;
+    if (typeof v === "object") {
+      try {
+        out[k] = JSON.stringify(v);
+      } catch {
+        out[k] = String(v);
+      }
+    } else {
+      out[k] = String(v);
+    }
+  }
+  return out;
+}
+
 export type InboundLeadPayload = {
   formType: LeadFormType;
   /** Form alanları (string); boş alanlar göndermeyebilir veya "" olabilir */
