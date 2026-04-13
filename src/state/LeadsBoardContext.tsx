@@ -90,6 +90,26 @@ export function LeadsBoardProvider({ children }: { children: ReactNode }) {
     void reload();
   }, [reload]);
 
+  /** Webhook / başka sekmeden gelen lead’ler için; tam sayfa yenileme gerekmez */
+  useEffect(() => {
+    const SOFT_POLL_MS = 25_000;
+    const tick = () => {
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      void reload({ soft: true });
+    };
+    const id = setInterval(tick, SOFT_POLL_MS);
+    const onVisible = () => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        void reload({ soft: true });
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [reload]);
+
   const kanbanColumns = useMemo((): KanbanColumnDef[] => {
     const hidden = new Set(hiddenBuiltinStageIds);
     const base = STAGE_ORDER.filter((id) => !hidden.has(id)).map((id) => ({
