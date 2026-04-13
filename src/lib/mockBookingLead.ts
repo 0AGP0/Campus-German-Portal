@@ -1,0 +1,50 @@
+import type { Lead } from "@/data/leads";
+
+/** Demo booking — PDF denemesi ve `prisma/seed` ile veritabanına yazılan örnek kayıt (aynı id). */
+export const MOCK_BOOKING_LEAD_ID = "demo-booking-mock-001";
+
+/** PDF / fiyat dilimi denemesi için sabit örnek booking lead. */
+export const MOCK_BOOKING_LEAD: Lead = {
+  id: MOCK_BOOKING_LEAD_ID,
+  name: "Max Mustermann",
+  email: "max.mustermann@example.com",
+  phone: "+49 170 0000000",
+  stage: "teklif",
+  course: "Deutsch Intensiv · B2",
+  city: "Bremen",
+  noteLog: [],
+  value: "1.560",
+  createdAt: "2026-04-12",
+  formType: "booking",
+  formData: {
+    firstName: "Max",
+    lastName: "Mustermann",
+    email: "max.mustermann@example.com",
+    phone: "+49 170 0000000",
+    address: "Musterstrasse 12",
+    postalCode: "28195",
+    city: "Bremen",
+    country: "Deutschland",
+    dateOfBirth: "15.03.1998",
+    placeOfBirth: "Istanbul",
+    nationality: "Tuerkisch",
+    passportNumber: "U12345678",
+    startDate: "2026-06-01",
+    courseWeeks: "12",
+    price: "1560",
+    selectedProgram: "Deutsch Intensivkurs B2",
+    program: "Intensiv",
+    programType: "Praesenz",
+    visaRequirement: "Ja",
+    accommodationRequirement: "Ja",
+    airportTransferPackage: "Nein",
+    formDate: "2026-04-12",
+  },
+  source: "Mock / Demo",
+  priority: "B",
+  language: "de",
+  nextStep: "—",
+  lost: false,
+  starred: false,
+  tags: [],
+};

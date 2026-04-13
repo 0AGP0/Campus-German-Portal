@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  stage     String
+  course    String
+  city      String
+  value     String
+  createdAt DateTime @default(now())
+  formType  String
+  formData  Json
+  source    String
+  priority  String
+  language  String
+  nextStep  String
+  lost      Boolean  @default(false)
+  starred   Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+  notes     LeadNote[]
+  tags      LeadTag[]
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+  author    String?
+}
+
+model LeadTag {
+  id     String @id @default(cuid())
+  leadId String
+  lead   Lead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  label  String
+}
+
+model ExtraKanbanColumn {
+  id        String @id
+  label     String
+  sortOrder Int    @default(0)
+}
+
+/** Tekil satır — panoda gizlenen yerleşik aşamalar (yeni, iletisim, …) */
+model KanbanBoardSettings {
+  id                    String   @id @default("default")
+  hiddenBuiltinStageIds String[] @default([])
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

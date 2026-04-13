@@ -1,0 +1,7 @@
+{
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/bootstrap/route": "app/api/bootstrap/route.js",
+  "/api/leads/[id]/route": "app/api/leads/[id]/route.js",
+  "/(crm)/page": "app/(crm)/page.js",
+  "/(crm)/kanban/lead/[id]/page": "app/(crm)/kanban/lead/[id]/page.js"
+}

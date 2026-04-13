@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 56" fill="none" role="img" aria-label="Campus German">
+  <!-- Üç yaprakl1 marka ikonu -->
+  <circle cx="22" cy="18" r="14" fill="#ff3a3a"/>
+  <circle cx="38" cy="34" r="14" fill="#0cc0df"/>
+  <circle cx="14" cy="34" r="14" fill="#ffd21f"/>
+  <text x="58" y="24" fill="#1e293b" font-family="system-ui,Segoe UI,sans-serif" font-size="15" font-weight="700">Campus</text>
+  <text x="58" y="44" fill="#1e293b" font-family="system-ui,Segoe UI,sans-serif" font-size="15" font-weight="700">German</text>
+</svg>
