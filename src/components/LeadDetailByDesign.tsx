@@ -15,10 +15,18 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { env } from "@/config/env";
 import { DETAIL_FORM_CATEGORIES, FORM_TYPE_LABEL_TR, getCategorizedDetailFormRows } from "@/data/leadFormFields";
 import type { Lead, LeadNoteEntry } from "@/data/leads";
 import { STAGE_LABEL } from "@/data/leads";
 import { useLeadsBoard } from "@/state/LeadsBoardContext";
+
+/** İstemci — API aynı origin veya NEXT_PUBLIC_API_BASE_URL ile ayrı host */
+function apiAssetUrl(path: string): string {
+  const base = env.apiBaseUrl.replace(/\/$/, "");
+  if (!base) return path.startsWith("/") ? path : `/${path}`;
+  return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+}
 
 function initialsFromName(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -379,7 +387,31 @@ export function LeadDetailByDesign({ lead, backTo, pipelineLabel }: Props) {
                             className="grid grid-cols-1 gap-1 py-4 sm:grid-cols-[minmax(0,11.5rem)_minmax(0,1fr)] sm:gap-8 sm:py-3.5"
                           >
                             <dt className="text-[13px] font-bold leading-snug text-cg-cyan-dark">{row.label}</dt>
-                            <dd className="min-w-0 text-[15px] font-medium leading-relaxed text-slate-900">{row.value}</dd>
+                            <dd className="min-w-0 text-[15px] font-medium leading-relaxed text-slate-900">
+                              {lead.formType === "private-documents-form" &&
+                              (row.key === "passport_copy_path" || row.key === "digital_signature_path") &&
+                              row.value !== "—" ? (
+                                <span className="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-3">
+                                  <span className="break-all font-mono text-[13px] font-normal text-slate-600">
+                                    {row.value}
+                                  </span>
+                                  <a
+                                    href={apiAssetUrl(
+                                      `/api/leads/${lead.id}/documents/private-upload?slot=${
+                                        row.key === "passport_copy_path" ? "passport" : "signature"
+                                      }`,
+                                    )}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex shrink-0 text-[13px] font-semibold text-cg-cyan-dark underline underline-offset-2 hover:text-cg-cyan"
+                                  >
+                                    Dosyayı aç / indir
+                                  </a>
+                                </span>
+                              ) : (
+                                row.value
+                              )}
+                            </dd>
                           </div>
                         ))}
                       </dl>

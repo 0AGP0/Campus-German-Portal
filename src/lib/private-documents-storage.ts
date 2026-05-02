@@ -117,3 +117,44 @@ export async function savePassportFile(
 export function newLeadId(): string {
   return randomUUID();
 }
+
+function mimeFromFilename(filename: string): string {
+  const lower = filename.toLowerCase();
+  if (lower.endsWith(".pdf")) return "application/pdf";
+  if (lower.endsWith(".png")) return "image/png";
+  if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+  if (lower.endsWith(".webp")) return "image/webp";
+  return "application/octet-stream";
+}
+
+/**
+ * CRM indirme endpoint’i: göreli anahtar + leadId ile disk yolunu doğrular (path traversal yok).
+ */
+export function resolvePrivateUploadForLead(
+  leadId: string,
+  relativeKey: string,
+): { absPath: string; downloadName: string; mime: string } | null {
+  const norm = relativeKey.trim().replace(/\\/g, "/").replace(/^\/+/, "");
+  if (!norm || norm.includes("..")) return null;
+  const segments = norm.split("/").filter(Boolean);
+  if (segments.length !== 3) return null;
+  if (segments[0] !== "private-documents") return null;
+  if (segments[1] !== leadId) return null;
+  const filename = segments[2];
+  if (!filename || filename.includes("..") || filename.includes("/")) return null;
+
+  const passportOk = /^passport_copy\.(pdf|png|jpe?g|webp)$/i.test(filename);
+  const signatureOk = filename === "signature.png";
+  if (!passportOk && !signatureOk) return null;
+
+  const root = path.resolve(getUploadRoot());
+  const absPath = path.resolve(root, ...segments);
+  const relToRoot = path.relative(root, absPath);
+  if (relToRoot.startsWith("..") || path.isAbsolute(relToRoot)) return null;
+
+  return {
+    absPath,
+    downloadName: filename,
+    mime: mimeFromFilename(filename),
+  };
+}
