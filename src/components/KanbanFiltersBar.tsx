@@ -20,7 +20,7 @@ type Props = {
   stageColumns: KanbanColumnDef[];
 };
 
-const FORM_TYPES: LeadFormType[] = ["booking", "contact", "quote"];
+const FORM_TYPES: LeadFormType[] = ["booking", "contact", "quote", "private-documents-form"];
 
 function toggle<T extends string>(arr: T[], item: T): T[] {
   if (arr.includes(item)) return arr.filter((x) => x !== item);
@@ -96,7 +96,7 @@ export function KanbanFiltersBar({ value, onChange, stageColumns }: Props) {
       search: "",
       searchFieldKeys: ["name", "email", "phone", "city"],
       stages: stageColumns.map((c) => c.id as LeadStage),
-      formTypes: ["booking", "contact", "quote"],
+      formTypes: ["booking", "contact", "quote", "private-documents-form"],
       lostFilter: "active",
       sortOrder: "newest",
     });

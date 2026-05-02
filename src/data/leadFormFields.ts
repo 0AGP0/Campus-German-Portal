@@ -31,6 +31,16 @@ export const CARD_PREVIEW_KEYS: Record<LeadFormType, readonly string[]> = {
     "price",
     "formDate",
   ],
+  "private-documents-form": [
+    "first_name",
+    "last_name",
+    "email",
+    "passport_no",
+    "city",
+    "country",
+    "phone",
+    "formDate",
+  ],
 };
 
 /**
@@ -96,12 +106,33 @@ export const DETAIL_FIELD_KEYS: Record<LeadFormType, readonly string[]> = {
     "formDate",
     "sourcePage",
   ],
+  "private-documents-form": [
+    "first_name",
+    "last_name",
+    "email",
+    "phone",
+    "birth_date",
+    "nationality",
+    "birth_place",
+    "passport_no",
+    "city",
+    "country",
+    "message",
+    "sourcePage",
+    "lang",
+    "passport_copy_path",
+    "digital_signature_path",
+    "terms_accepted",
+    "privacy_accepted",
+    "formDate",
+  ],
 };
 
 export const FORM_TYPE_LABEL_TR: Record<LeadFormType, string> = {
   booking: "Booking",
   contact: "İletişim formu",
   quote: "Teklif formu",
+  "private-documents-form": "Özel evrak formu",
 };
 
 export const FIELD_LABEL_TR: Record<string, string> = {
@@ -141,6 +172,16 @@ export const FIELD_LABEL_TR: Record<string, string> = {
   numberOfMonths: "Ay sayısı",
   accommodation: "Konaklama",
   airportPickup: "Havalimanı karşılama",
+  first_name: "Ad",
+  last_name: "Soyad",
+  birth_date: "Doğum tarihi",
+  birth_place: "Doğum yeri",
+  passport_no: "Pasaport no",
+  passport_copy_path: "Pasaport dosyası (yol)",
+  digital_signature_path: "Dijital imza (yol)",
+  terms_accepted: "Şartlar kabul",
+  privacy_accepted: "Gizlilik politikası kabul",
+  lang: "Form dili",
 };
 
 export function getKanbanCardFieldRows(lead: Lead): { label: string; value: string }[] {
@@ -177,6 +218,13 @@ const KANBAN_CARD_SECTIONS: Record<LeadFormType, { title: string; keys: readonly
     { title: "İletişim", keys: ["email"] },
     { title: "Koşullar", keys: ["visaRequirement", "accommodation"] },
     { title: "Ücret ve kayıt", keys: ["price", "formDate"] },
+  ],
+  "private-documents-form": [
+    { title: "Kişi", keys: ["first_name", "last_name", "email", "phone"] },
+    { title: "Kimlik", keys: ["birth_date", "birth_place", "nationality", "passport_no"] },
+    { title: "Adres", keys: ["city", "country"] },
+    { title: "Mesaj ve kaynak", keys: ["message", "sourcePage", "lang", "formDate"] },
+    { title: "Dosyalar ve onay", keys: ["passport_copy_path", "digital_signature_path", "terms_accepted", "privacy_accepted"] },
   ],
 };
 
@@ -271,6 +319,17 @@ export const DETAIL_FORM_CATEGORIES: Record<LeadFormType, readonly DetailFormCat
     { id: "program", title: "Program", keys: ["program", "level", "numberOfMonths"] },
     { id: "kosullar", title: "Vize, konaklama ve transfer", keys: ["visaRequirement", "accommodation", "airportPickup"] },
     { id: "ticari", title: "Fiyat ve kaynak", keys: ["price", "formDate", "sourcePage"] },
+  ],
+  "private-documents-form": [
+    { id: "kisi", title: "Kişi ve iletişim", keys: ["first_name", "last_name", "email", "phone"] },
+    { id: "kimlik", title: "Kimlik bilgileri", keys: ["birth_date", "birth_place", "nationality", "passport_no"] },
+    { id: "adres", title: "Konum", keys: ["city", "country"] },
+    { id: "mesaj", title: "Mesaj ve kaynak", keys: ["message", "sourcePage", "lang", "formDate"] },
+    {
+      id: "dosya",
+      title: "Dosyalar ve onay",
+      keys: ["passport_copy_path", "digital_signature_path", "terms_accepted", "privacy_accepted"],
+    },
   ],
 };
 

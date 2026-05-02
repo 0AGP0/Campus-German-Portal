@@ -31,3 +31,10 @@ export function verifyWebhook(req: NextRequest): boolean {
   }
   return collectWebhookTokens(req).some((t) => t === WEBHOOK_SECRET);
 }
+
+/** Özel evrak webhook: `WEBHOOK_SECRET` zorunlu; yok veya yanlış → false (401) */
+export function verifyPrivateDocumentsWebhook(req: NextRequest): boolean {
+  const secret = process.env.WEBHOOK_SECRET?.trim();
+  if (!secret) return false;
+  return collectWebhookTokens(req).some((t) => t === secret);
+}

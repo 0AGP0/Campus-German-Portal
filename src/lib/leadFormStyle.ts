@@ -10,6 +10,8 @@ export const FORM_TYPE_AURORA_CARD: Record<LeadFormType, string> = {
     "border-cg-cyan/35 bg-gradient-to-br from-white via-emerald-50/80 to-slate-50 ring-1 ring-inset ring-emerald-200/60 shadow-sm hover:shadow-md",
   quote:
     "border-cg-yellow/50 bg-gradient-to-br from-white via-amber-50/90 to-slate-50 ring-1 ring-inset ring-cg-yellow/35 shadow-sm hover:shadow-md",
+  "private-documents-form":
+    "border-violet-400/45 bg-gradient-to-br from-white via-violet-50/85 to-slate-50 ring-1 ring-inset ring-violet-300/50 shadow-sm hover:shadow-md",
 };
 
 /** Eski beyaz CRM kartı (kullanılırsa) */
@@ -32,6 +34,12 @@ export function formTypeCardTone(form: LeadFormType) {
         "border-amber-400/45 bg-gradient-to-br from-amber-50 via-white to-white ring-1 ring-amber-500/10 shadow-amber-950/10",
       nextBox: "border-amber-200/90 bg-amber-50/95",
       nextTitle: "text-amber-900",
+    },
+    "private-documents-form": {
+      shell:
+        "border-violet-400/45 bg-gradient-to-br from-violet-50 via-white to-white ring-1 ring-violet-500/10 shadow-violet-950/10",
+      nextBox: "border-violet-200/90 bg-violet-50/95",
+      nextTitle: "text-violet-900",
     },
   } as const;
   return map[form];

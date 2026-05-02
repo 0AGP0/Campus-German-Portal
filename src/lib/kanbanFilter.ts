@@ -21,7 +21,7 @@ export function defaultKanbanFilter(): KanbanFilterState {
     search: "",
     searchFieldKeys: [...DEFAULT_SEARCH_KEYS],
     stages: [...STAGE_ORDER],
-    formTypes: ["booking", "contact", "quote"],
+    formTypes: ["booking", "contact", "quote", "private-documents-form"],
     lostFilter: "active",
     sortOrder: "newest",
   };
@@ -80,7 +80,7 @@ export function getFilterFieldOptions(): FilterFieldOption[] {
     group: "alan",
   });
 
-  for (const ft of ["booking", "contact", "quote"] as const) {
+  for (const ft of ["booking", "contact", "quote", "private-documents-form"] as const) {
     for (const k of DETAIL_FIELD_KEYS[ft]) {
       if (!byKey.has(k)) {
         byKey.set(k, {

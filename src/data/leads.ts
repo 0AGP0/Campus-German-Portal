@@ -1,8 +1,8 @@
 /** Yerleşik + dinamik Kanban sütun kimlikleri */
 export type LeadStage = string;
 
-/** WordPress / siteden gelen üç form tipi — kart rengi ve alan seti */
-export type LeadFormType = "booking" | "contact" | "quote";
+/** Siteden gelen form tipleri — kart rengi ve alan seti */
+export type LeadFormType = "booking" | "contact" | "quote" | "private-documents-form";
 
 /** CRM’de danışman notları — kronolojik günlük satırı */
 export type LeadNoteEntry = {
