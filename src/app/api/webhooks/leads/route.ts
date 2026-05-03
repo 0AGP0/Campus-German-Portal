@@ -30,11 +30,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Webhook doğrulanamadı" }, { status: 401 });
   }
   const body = (await req.json()) as Record<string, unknown>;
-  const formType = body.formType as InboundLeadPayload["formType"] | undefined;
+  const rawFormType = typeof body.formType === "string" ? body.formType.trim() : "";
+  /** Make.com teklif senaryosu: `price-quote` → CRM’de `quote` */
+  const formType =
+    rawFormType === "price-quote"
+      ? "quote"
+      : (rawFormType as InboundLeadPayload["formType"] | "");
   const rawFd = body.formData;
   const formData = normalizeInboundFormData(rawFd);
   if (!formType || !["booking", "contact", "quote"].includes(formType)) {
-    return NextResponse.json({ error: "formType: booking | contact | quote gerekli" }, { status: 400 });
+    return NextResponse.json(
+      { error: "formType: booking | contact | quote (Make: price-quote → quote) gerekli" },
+      { status: 400 },
+    );
   }
   if (rawFd !== undefined && rawFd !== null && (typeof rawFd !== "object" || Array.isArray(rawFd))) {
     return NextResponse.json({ error: "formData nesne (object) olmalı" }, { status: 400 });
