@@ -28,6 +28,12 @@ function apiAssetUrl(path: string): string {
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+/** JSON’da kaçmış `\\n` metni + HTML’de satır sonlarının görünmesi */
+function formatFormFieldDisplayValue(raw: string): string {
+  if (raw === "—") return raw;
+  return raw.replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n").replace(/\\r/g, "\n");
+}
+
 function initialsFromName(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "?";
@@ -387,13 +393,13 @@ export function LeadDetailByDesign({ lead, backTo, pipelineLabel }: Props) {
                             className="grid grid-cols-1 gap-1 py-4 sm:grid-cols-[minmax(0,11.5rem)_minmax(0,1fr)] sm:gap-8 sm:py-3.5"
                           >
                             <dt className="text-[13px] font-bold leading-snug text-cg-cyan-dark">{row.label}</dt>
-                            <dd className="min-w-0 text-[15px] font-medium leading-relaxed text-slate-900">
+                            <dd className="min-w-0 whitespace-pre-wrap break-words text-[15px] font-medium leading-relaxed text-slate-900">
                               {lead.formType === "private-documents-form" &&
                               (row.key === "passport_copy_path" || row.key === "digital_signature_path") &&
                               row.value !== "—" ? (
                                 <span className="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-3">
-                                  <span className="break-all font-mono text-[13px] font-normal text-slate-600">
-                                    {row.value}
+                                  <span className="break-all font-mono text-[13px] font-normal text-slate-600 whitespace-normal">
+                                    {formatFormFieldDisplayValue(row.value)}
                                   </span>
                                   <a
                                     href={apiAssetUrl(
@@ -409,7 +415,7 @@ export function LeadDetailByDesign({ lead, backTo, pipelineLabel }: Props) {
                                   </a>
                                 </span>
                               ) : (
-                                row.value
+                                formatFormFieldDisplayValue(row.value)
                               )}
                             </dd>
                           </div>
