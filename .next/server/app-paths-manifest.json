@@ -1,7 +1,6 @@
 {
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/api/bootstrap/route": "app/api/bootstrap/route.js",
-  "/api/leads/[id]/route": "app/api/leads/[id]/route.js",
-  "/(crm)/page": "app/(crm)/page.js",
-  "/(crm)/kanban/lead/[id]/page": "app/(crm)/kanban/lead/[id]/page.js"
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/leads/[id]/documents/course-reservation/route": "app/api/leads/[id]/documents/course-reservation/route.js",
+  "/(crm)/kanban/lead/[id]/course-reservation/page": "app/(crm)/kanban/lead/[id]/course-reservation/page.js"
 }

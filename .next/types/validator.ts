@@ -47,6 +47,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 }
 
 
+// Validate ../../src/app/(crm)/kanban/lead/[id]/course-reservation/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/kanban/lead/[id]/course-reservation">> = Specific
+  const handler = {} as typeof import("../../src/app/(crm)/kanban/lead/[id]/course-reservation/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../src/app/(crm)/kanban/lead/[id]/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/kanban/lead/[id]">> = Specific
@@ -155,6 +164,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../src/app/api/leads/[id]/documents/course-reservation/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/leads/[id]/documents/course-reservation">> = Specific
+  const handler = {} as typeof import("../../src/app/api/leads/[id]/documents/course-reservation/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../src/app/api/leads/[id]/documents/private-upload/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/leads/[id]/documents/private-upload">> = Specific
+  const handler = {} as typeof import("../../src/app/api/leads/[id]/documents/private-upload/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../src/app/api/leads/[id]/notes/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/leads/[id]/notes">> = Specific
@@ -195,6 +222,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/webhooks/leads">> = Specific
   const handler = {} as typeof import("../../src/app/api/webhooks/leads/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../src/app/api/webhooks/private-documents/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/webhooks/private-documents">> = Specific
+  const handler = {} as typeof import("../../src/app/api/webhooks/private-documents/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check

@@ -21,25 +21,25 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(crm)/layout.js"
     ],
-    "/(crm)/page": [
+    "/(crm)/kanban/lead/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(crm)/page.js"
+      "static/chunks/app/(crm)/kanban/lead/[id]/page.js"
     ],
     "/api/bootstrap/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/bootstrap/route.js"
     ],
-    "/(crm)/kanban/lead/[id]/page": [
+    "/api/leads/[id]/documents/course-reservation/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(crm)/kanban/lead/[id]/page.js"
+      "static/chunks/app/api/leads/[id]/documents/course-reservation/route.js"
     ],
-    "/api/leads/[id]/route": [
+    "/(crm)/kanban/lead/[id]/course-reservation/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/leads/[id]/route.js"
+      "static/chunks/app/(crm)/kanban/lead/[id]/course-reservation/page.js"
     ]
   }
 }

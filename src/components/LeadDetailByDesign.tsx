@@ -6,9 +6,7 @@ import {
   ArrowLeft,
   Calendar,
   ChevronRight,
-  FileText,
   Hash,
-  Loader2,
   Mail,
   MapPin,
   Phone,
@@ -16,6 +14,7 @@ import {
 import Link from "next/link";
 
 import { env } from "@/config/env";
+import { CourseReservationDialog } from "@/components/CourseReservationDialog";
 import { DETAIL_FORM_CATEGORIES, FORM_TYPE_LABEL_TR, getCategorizedDetailFormRows } from "@/data/leadFormFields";
 import type { Lead, LeadNoteEntry } from "@/data/leads";
 import { STAGE_LABEL } from "@/data/leads";
@@ -39,14 +38,6 @@ function initialsFromName(name: string): string {
   if (parts.length === 0) return "?";
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-
-/** API’nin döndürdüğü base64 — ham ikili yanıtın bozulmasını önler */
-function base64ToBlob(b64: string, mime: string): Blob {
-  const bin = atob(b64);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  return new Blob([bytes], { type: mime });
 }
 
 function formatNoteTimestamp(iso: string): string {
@@ -181,44 +172,7 @@ type Props = {
  * Lead detayı — PortalShell içinde: üst bağlam, sol özet, sağda kategorili form + not günlüğü.
  */
 export function LeadDetailByDesign({ lead, backTo, pipelineLabel }: Props) {
-  const [pdfPending, setPdfPending] = useState(false);
   const { setLeadLost } = useLeadsBoard();
-
-  async function downloadBookingOfficialPdf() {
-    setPdfPending(true);
-    try {
-      const res = await fetch(`/api/leads/${encodeURIComponent(lead.id)}/documents/booking-official`, {
-        credentials: "include",
-        cache: "no-store",
-      });
-      const payload = (await res.json().catch(() => null)) as
-        | { error?: string; pdfBase64?: string; filename?: string }
-        | null;
-      if (!payload) {
-        window.alert("Sunucu yanıtı okunamadı.");
-        return;
-      }
-      if (!res.ok) {
-        window.alert(payload.error ?? "Belge indirilemedi");
-        return;
-      }
-      if (!payload.pdfBase64) {
-        window.alert(payload.error ?? "Sunucu PDF verisi göndermedi.");
-        return;
-      }
-      const blob = base64ToBlob(payload.pdfBase64, "application/pdf");
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download =
-        payload.filename?.replace(/[/\\?%*:|"<>]/g, "_") ??
-        `CampusGerman_Booking_${lead.id.slice(0, 12)}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } finally {
-      setPdfPending(false);
-    }
-  }
 
   const formSections = useMemo(() => {
     const rows = getCategorizedDetailFormRows(lead);
@@ -279,20 +233,8 @@ export function LeadDetailByDesign({ lead, backTo, pipelineLabel }: Props) {
                 Kayba çek
               </button>
             )}
-            {lead.formType === "booking" ? (
-              <button
-                type="button"
-                disabled={pdfPending}
-                onClick={() => void downloadBookingOfficialPdf()}
-                className="inline-flex items-center gap-2 rounded-lg border border-cg-cyan/40 bg-cg-cyan/10 px-3 py-2 text-[13px] font-semibold text-cg-cyan-dark transition hover:bg-cg-cyan/18 disabled:opacity-50"
-              >
-                {pdfPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                ) : (
-                  <FileText className="h-4 w-4" aria-hidden />
-                )}
-                Teklif belgesi
-              </button>
+            {lead.formType === "quote" || lead.formType === "booking" ? (
+              <CourseReservationDialog lead={lead} />
             ) : null}
           </div>
         </div>
