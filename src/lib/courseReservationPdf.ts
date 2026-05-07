@@ -128,7 +128,17 @@ export function buildCourseReservationDraft(lead: Lead): CourseReservationDraft 
       .trim() || lead.name,
     residence: [pick(fd, "city"), pick(fd, "country")].filter(Boolean).join(", "),
     courseLevel: normalizeCourseLevel(pick(fd, "level", "quoteLevelStart", "selectedProgram")),
-    courseStart: normalizeCourseStart(pick(fd, "startDateValue", "startDate", "startMonthLabel", "quoteMonthStart")),
+    courseStart: normalizeCourseStart(
+      pick(
+        fd,
+        "startDateIso",
+        "startDateLabel",
+        "startDateValue",
+        "startDate",
+        "startMonthLabel",
+        "quoteMonthStart",
+      ),
+    ),
     courseFormat: normalizeCourseFormat(pick(fd, "program", "quoteProgramLabel"), pick(fd, "intensiveType", "programType")),
     courseWeek: normalizeCourseWeek(pick(fd, "weeks", "courseWeeks", "numberOfMonths")),
     courseFee,
