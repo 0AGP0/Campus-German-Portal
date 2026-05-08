@@ -83,13 +83,34 @@ function optionMonthYear(opt: string): { month: number; year: number } {
 }
 
 function matchCourseStartOption(month: number, year?: number): string {
+  const y = year ?? 2026;
   const sameMonth = COURSE_START_OPTIONS.filter((x) => optionMonthYear(x).month === month);
-  if (sameMonth.length === 0) return COURSE_START_OPTIONS[1];
+  if (sameMonth.length === 0) {
+    const anchor = Date.UTC(y, month - 1, 1);
+    let best: (typeof COURSE_START_OPTIONS)[number] = COURSE_START_OPTIONS[0];
+    let bestDiff = Infinity;
+    for (const opt of COURSE_START_OPTIONS) {
+      const t = optionAsUtcMs(opt);
+      const diff = Math.abs(t - anchor);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        best = opt;
+      }
+    }
+    return best;
+  }
   if (year !== undefined && !Number.isNaN(year)) {
     const byYear = sameMonth.find((x) => optionMonthYear(x).year === year);
     if (byYear) return byYear;
   }
   return sameMonth[0] ?? COURSE_START_OPTIONS[1];
+}
+
+function optionAsUtcMs(opt: string): number {
+  const day = Number.parseInt(opt.slice(0, 2), 10);
+  const month = Number.parseInt(opt.slice(3, 5), 10) - 1;
+  const year = Number.parseInt(opt.slice(6, 10), 10);
+  return Date.UTC(year, month, day);
 }
 
 const DE_MONTHS: Record<string, number> = {
@@ -124,6 +145,17 @@ function parseGermanDateLabel(label: string): { month: number; year: number } | 
   return null;
 }
 
+/** `2026-03-02` veya `2026-03-02T…` öneki — Course start için birincil kaynak */
+function matchCourseStartFromIsoDateString(raw: string): string | null {
+  const t = raw.trim();
+  const parts = /^(\d{4})-(\d{2})-(\d{2})/.exec(t);
+  if (!parts) return null;
+  const y = Number(parts[1]);
+  const mo = Number(parts[2]);
+  if (mo < 1 || mo > 12 || Number.isNaN(y)) return null;
+  return matchCourseStartOption(mo, y);
+}
+
 /** Tek alandan (eski akış): tam seçenek, ay numarası 1–12 veya parse edilebilir tarih */
 function normalizeCourseStartLegacy(raw: string): string {
   const t = raw.trim();
@@ -146,16 +178,14 @@ function normalizeCourseStartLegacy(raw: string): string {
 }
 
 /**
- * Lead formundan kurs başlangıcı: ISO ve etiket önce; ay için `startMonthLabel` ile
- * `startDateValue` (çoğu sitede gün) karışmasın diye ay alanı ayrı ele alınır.
+ * Kurs başlangıcı (PDF dropdown).
+ * Öncelik: CRM’deki «Başlangıç tarihi (ISO)» ve «Başlangıç tarihi (değer)» — `YYYY-MM-DD`.
+ * Bunlar yoksa etiket / ay alanı / eski tek alan.
  */
 function resolveCourseStartFromFormData(fd: Record<string, string>): string {
-  const iso = pick(fd, "startDateIso").trim();
-  const isoParts = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
-  if (isoParts) {
-    const y = Number(isoParts[1]);
-    const m = Number(isoParts[2]);
-    return matchCourseStartOption(m, y);
+  for (const key of ["startDateIso", "startDateValue"] as const) {
+    const hit = matchCourseStartFromIsoDateString(fd[key] ?? "");
+    if (hit) return hit;
   }
 
   const label = pick(fd, "startDateLabel").trim();
