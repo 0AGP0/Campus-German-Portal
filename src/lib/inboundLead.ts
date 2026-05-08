@@ -55,7 +55,9 @@ function courseLine(formType: LeadFormType, fd: Record<string, string>): string 
     return [fd.level, fd.applicationType].filter(Boolean).join(" · ") || pick(fd.message);
   }
   return (
-    [fd.program, fd.courseTitle, fd.level, fd.numberOfMonths].filter(Boolean).join(" · ") || "—"
+    [fd.program, fd.courseTitle, fd.level, fd.courseSelection, fd.startDateLabel]
+      .filter(Boolean)
+      .join(" · ") || "—"
   );
 }
 

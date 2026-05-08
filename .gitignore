@@ -1,5 +1,9 @@
 node_modules
 dist
+
+# Next.js derleme çıktısı (VPS’te build sonrası git pull çakışmasın diye repoda tutulmamalı)
+.next/
+out/
 .DS_Store
 *.local
 .env
