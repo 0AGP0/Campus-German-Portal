@@ -75,23 +75,107 @@ function normalizeCourseLevel(raw: string): string {
   return "B1, B2";
 }
 
-function normalizeCourseStart(raw: string): string {
+/** PDF şablonundaki tarihler DD-MM-YYYY */
+function optionMonthYear(opt: string): { month: number; year: number } {
+  const month = Number.parseInt(opt.slice(3, 5), 10);
+  const year = Number.parseInt(opt.slice(6, 10), 10);
+  return { month, year };
+}
+
+function matchCourseStartOption(month: number, year?: number): string {
+  const sameMonth = COURSE_START_OPTIONS.filter((x) => optionMonthYear(x).month === month);
+  if (sameMonth.length === 0) return COURSE_START_OPTIONS[1];
+  if (year !== undefined && !Number.isNaN(year)) {
+    const byYear = sameMonth.find((x) => optionMonthYear(x).year === year);
+    if (byYear) return byYear;
+  }
+  return sameMonth[0] ?? COURSE_START_OPTIONS[1];
+}
+
+const DE_MONTHS: Record<string, number> = {
+  januar: 1,
+  februar: 2,
+  märz: 3,
+  marz: 3,
+  april: 4,
+  mai: 5,
+  juni: 6,
+  juli: 7,
+  august: 8,
+  september: 9,
+  oktober: 10,
+  november: 11,
+  dezember: 12,
+};
+
+function parseGermanDateLabel(label: string): { month: number; year: number } | null {
+  const t = label.trim().toLowerCase();
+  const dmYWord = /^(\d{1,2})\.\s*([a-zäöü]+)\s*(\d{4})/i.exec(t);
+  if (dmYWord) {
+    const monKey = dmYWord[2].toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
+    const m = DE_MONTHS[monKey];
+    const y = Number(dmYWord[3]);
+    if (m && y) return { month: m, year: y };
+  }
+  const dmy = /^(\d{1,2})\.(\d{1,2})\.(\d{4})\b/.exec(t);
+  if (dmy) {
+    return { month: Number(dmy[2]), year: Number(dmy[3]) };
+  }
+  return null;
+}
+
+/** Tek alandan (eski akış): tam seçenek, ay numarası 1–12 veya parse edilebilir tarih */
+function normalizeCourseStartLegacy(raw: string): string {
   const t = raw.trim();
   if (!t) return COURSE_START_OPTIONS[1];
   if (COURSE_START_OPTIONS.includes(t as (typeof COURSE_START_OPTIONS)[number])) return t;
+  const isoParts = /^(\d{4})-(\d{2})-(\d{2})/.exec(t);
+  if (isoParts) {
+    return matchCourseStartOption(Number(isoParts[2]), Number(isoParts[1]));
+  }
   const monthNum = Number.parseInt(t, 10);
   if (!Number.isNaN(monthNum) && monthNum >= 1 && monthNum <= 12) {
-    const hit = COURSE_START_OPTIONS.find((x) => Number.parseInt(x.slice(3, 5), 10) === monthNum);
-    if (hit) return hit;
+    return matchCourseStartOption(monthNum);
   }
   const parsed = Date.parse(t);
   if (!Number.isNaN(parsed)) {
     const d = new Date(parsed);
-    const m = d.getMonth() + 1;
-    const hit = COURSE_START_OPTIONS.find((x) => Number.parseInt(x.slice(3, 5), 10) === m);
-    if (hit) return hit;
+    return matchCourseStartOption(d.getMonth() + 1, d.getFullYear());
   }
   return COURSE_START_OPTIONS[1];
+}
+
+/**
+ * Lead formundan kurs başlangıcı: ISO ve etiket önce; ay için `startMonthLabel` ile
+ * `startDateValue` (çoğu sitede gün) karışmasın diye ay alanı ayrı ele alınır.
+ */
+function resolveCourseStartFromFormData(fd: Record<string, string>): string {
+  const iso = pick(fd, "startDateIso").trim();
+  const isoParts = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (isoParts) {
+    const y = Number(isoParts[1]);
+    const m = Number(isoParts[2]);
+    return matchCourseStartOption(m, y);
+  }
+
+  const label = pick(fd, "startDateLabel").trim();
+  if (label) {
+    const g = parseGermanDateLabel(label);
+    if (g) return matchCourseStartOption(g.month, g.year);
+    const parsed = Date.parse(label);
+    if (!Number.isNaN(parsed)) {
+      const d = new Date(parsed);
+      return matchCourseStartOption(d.getUTCMonth() + 1, d.getUTCFullYear());
+    }
+  }
+
+  const monthLabel = pick(fd, "startMonthLabel", "quoteMonthStart").trim();
+  const monthFromLabel = Number.parseInt(monthLabel, 10);
+  if (!Number.isNaN(monthFromLabel) && monthFromLabel >= 1 && monthFromLabel <= 12) {
+    return matchCourseStartOption(monthFromLabel);
+  }
+
+  return normalizeCourseStartLegacy(pick(fd, "startDateValue", "startDate"));
 }
 
 function normalizeCourseWeek(raw: string): string {
@@ -126,19 +210,11 @@ export function buildCourseReservationDraft(lead: Lead): CourseReservationDraft 
       .filter(Boolean)
       .join(" ")
       .trim() || lead.name,
-    residence: [pick(fd, "city"), pick(fd, "country")].filter(Boolean).join(", "),
+    residence: [pick(fd, "city"), pick(fd, "country"), pick(fd, "nationality")]
+      .filter(Boolean)
+      .join(", "),
     courseLevel: normalizeCourseLevel(pick(fd, "level", "quoteLevelStart", "selectedProgram")),
-    courseStart: normalizeCourseStart(
-      pick(
-        fd,
-        "startDateIso",
-        "startDateLabel",
-        "startDateValue",
-        "startDate",
-        "startMonthLabel",
-        "quoteMonthStart",
-      ),
-    ),
+    courseStart: resolveCourseStartFromFormData(fd),
     courseFormat: normalizeCourseFormat(pick(fd, "program", "quoteProgramLabel"), pick(fd, "intensiveType", "programType")),
     courseWeek: normalizeCourseWeek(pick(fd, "weeks", "courseWeeks", "numberOfMonths")),
     courseFee,
